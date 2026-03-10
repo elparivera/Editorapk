@@ -1,0 +1,3466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrackCloud — The all-in-one intelligent cloud provider</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #161616;
+    --surface: #1a1a1a;
+    --border: #242424;
+    --border2: #2e2e2e;
+    --text: #f0ede8;
+    --text2: #9a9590;
+    --text3: #5a5550;
+    --accent: #e8d5a3;
+    --accent2: #c4a46b;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ─── GRAIN OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.3;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+
+  nav.scrolled {
+    background: rgba(10,10,10,0.95);
+    border-bottom-color: var(--border2);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo svg {
+    width: 28px; height: 28px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+    font-weight: 400;
+  }
+
+  .nav-links a:hover { color: var(--text); background: var(--surface); }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: none;
+    font-family: 'Geist', sans-serif;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid transparent;
+  }
+
+  .btn-ghost:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+
+  .btn-primary {
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,213,163,0.2); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { border-color: var(--text3); background: var(--surface); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(232,213,163,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(96,165,250,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 80% 70%, rgba(167,139,250,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at center, black 0%, transparent 70%);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(232,213,163,0.07);
+    border: 1px solid rgba(232,213,163,0.15);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease forwards;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+  }
+
+  h1 {
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .h1-italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--text2);
+    max-width: 520px;
+    margin-bottom: 40px;
+    font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 80px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-hero {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    border: none;
+    font-family: 'Geist', sans-serif;
+  }
+
+  .btn-hero-primary {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  .btn-hero-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,213,163,0.25); }
+
+  .btn-hero-secondary {
+    background: var(--surface);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-hero-secondary:hover { color: var(--text); border-color: var(--text3); transform: translateY(-2px); }
+
+  /* ─── DEPLOY TERMINAL ─── */
+  .terminal-wrap {
+    width: 100%;
+    max-width: 700px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .terminal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-align: left;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  .terminal-bar {
+    background: var(--bg3);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f57; }
+  .terminal-dot.yellow { background: #ffbd2e; }
+  .terminal-dot.green { background: #28c840; }
+
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .terminal-body {
+    padding: 20px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .t-line { display: flex; gap: 12px; opacity: 0; animation: fadeInLine 0.3s ease forwards; }
+  .t-prompt { color: var(--accent2); }
+  .t-cmd { color: var(--text); }
+  .t-output { color: var(--text2); }
+  .t-success { color: var(--green); }
+  .t-info { color: var(--blue); }
+  .t-url { color: var(--purple); text-decoration: underline; cursor: pointer; }
+  .t-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--accent);
+    animation: blink 1.2s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ─── LOGOS ─── */
+  .logos-section {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .logos-label {
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+
+  .logos-track {
+    display: flex;
+    gap: 40px;
+    animation: scroll 25s linear infinite;
+    width: max-content;
+  }
+
+  .logos-track:hover { animation-play-state: paused; }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .logo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text3);
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    transition: color 0.2s;
+    letter-spacing: -0.01em;
+  }
+
+  .logo-item:hover { color: var(--text2); }
+
+  .logo-icon {
+    width: 24px; height: 24px;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .logo-item:hover .logo-icon { opacity: 0.8; }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 100px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  h2 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .section-desc {
+    font-size: 18px;
+    color: var(--text2);
+    max-width: 560px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* ─── FEATURES GRID ─── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 64px;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 36px 32px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .feature-card:hover { background: var(--bg2); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    width: 40px; height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+
+  .feature-card:hover .feature-icon {
+    background: rgba(232,213,163,0.1);
+    border-color: rgba(232,213,163,0.3);
+  }
+
+  .feature-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  /* ─── BIG FEATURE SECTIONS ─── */
+  .big-feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 100px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .big-feature.reverse { direction: rtl; }
+  .big-feature.reverse > * { direction: ltr; }
+
+  .feature-content { max-width: 480px; }
+
+  .feature-points {
+    list-style: none;
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feature-points li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  .feature-points li::before {
+    content: '';
+    width: 18px; height: 18px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%234ade80' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .feature-visual {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    min-height: 360px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(232,213,163,0.03) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ─── CANVAS VISUAL ─── */
+  .canvas-visual {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    position: relative;
+  }
+
+  .canvas-node {
+    position: absolute;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    min-width: 130px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .canvas-node:hover {
+    border-color: var(--accent2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .canvas-node-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .node-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .status-blue { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+  .status-purple { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+  .status-yellow { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+
+  .node-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .node-meta {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .canvas-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border2), var(--accent2), var(--border2));
+    opacity: 0.4;
+    transform-origin: left center;
+  }
+
+  /* ─── METRICS VISUAL ─── */
+  .metrics-visual {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .metric-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .metric-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .metric-label {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .metric-value {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .metric-bar {
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .metric-fill {
+    height: 100%;
+    border-radius: 2px;
+    position: relative;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+  }
+
+  .metric-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: inherit;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .fill-green { background: var(--green); }
+  .fill-blue { background: var(--blue); }
+  .fill-purple { background: var(--purple); }
+  .fill-yellow { background: #fbbf24; }
+
+  /* ─── CHART ─── */
+  .chart-container {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    margin-top: 8px;
+  }
+
+  .chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  .testimonials-section {
+    padding: 100px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 64px;
+  }
+
+  .testimonial {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .testimonial:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .testimonial-text {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .author-info { flex: 1; }
+  .author-name { font-size: 14px; font-weight: 600; }
+  .author-role { font-size: 12px; color: var(--text3); }
+
+  .testimonial-stars {
+    position: absolute;
+    top: 24px; right: 24px;
+    color: var(--accent2);
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  /* ─── STATS ─── */
+  .stats-section {
+    padding: 80px 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .stats-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .stat-item {
+    background: var(--bg2);
+    padding: 40px 32px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .stat-item:hover { background: var(--bg3); }
+
+  .stat-number {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text3);
+    font-weight: 400;
+  }
+
+  /* ─── PRICING ─── */
+  .pricing-section {
+    padding: 100px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 64px;
+    text-align: left;
+  }
+
+  .pricing-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .pricing-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .pricing-card.featured {
+    border-color: rgba(232,213,163,0.3);
+    background: linear-gradient(135deg, rgba(232,213,163,0.05) 0%, var(--bg2) 100%);
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -1px; right: 24px;
+    background: var(--accent2);
+    color: var(--bg);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .plan-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .plan-price {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .plan-price span {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text2);
+  }
+
+  .plan-desc {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .plan-features li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text2);
+    align-items: flex-start;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    color: var(--green);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .plan-features li.disabled::before { content: '−'; color: var(--text3); }
+  .plan-features li.disabled { color: var(--text3); }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    padding: 120px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at center, rgba(232,213,163,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(40px, 6vw, 72px);
+    margin-bottom: 20px;
+  }
+
+  .cta-section p {
+    font-size: 18px;
+    color: var(--text2);
+    max-width: 480px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 24px 40px;
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 60px;
+  }
+
+  .footer-brand p {
+    font-size: 14px;
+    color: var(--text3);
+    margin-top: 16px;
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .footer-col a {
+    font-size: 14px;
+    color: var(--text3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--text); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInLine {
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── MOBILE NAV TOGGLE ─── */
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    padding: 8px;
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 24px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text3);
+    border: none;
+    background: none;
+    font-family: 'Geist', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .tab:hover:not(.active) { color: var(--text2); }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .code-keyword { color: var(--purple); }
+  .code-string { color: var(--green); }
+  .code-comment { color: var(--text3); }
+  .code-var { color: var(--blue); }
+  .code-fn { color: var(--accent); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .big-feature { grid-template-columns: 1fr; gap: 40px; }
+    .big-feature.reverse { direction: ltr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .menu-toggle { display: block; }
+  }
+
+  @media (max-width: 600px) {
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    h1 { font-size: 42px; }
+    .hero-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo" id="nav-logo-main">
+    <span id="logo-img-wrap"><svg viewBox="0 0 28 28" fill="none" id="logo-svg-default">
+      <rect x="2" y="2" width="24" height="24" rx="6" fill="currentColor" opacity="0.1"/>
+      <path d="M7 14L14 7L21 14L14 21L7 14Z" fill="currentColor"/>
+      <circle cx="14" cy="14" r="3" fill="var(--bg)"/>
+    </svg></span>
+    <span id="logo-name-main">TrackCloud</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#features">Producto</a></li>
+    <li><a href="#deploy">Deploy</a></li>
+    <li><a href="#pricing">Precios</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#">Enterprise</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#" class="btn btn-ghost">Iniciar sesión</a>
+    <a href="#" class="btn btn-primary">Empezar gratis →</a>
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Nuevo: Agentes de IA integrados
+  </div>
+
+  <h1>Deploy con<br><em>total paz</em><br>mental</h1>
+
+  <p class="hero-sub">El proveedor cloud inteligente todo-en-uno. Conecta tu repo y TrackCloud hace el resto.</p>
+
+  <div class="hero-actions">
+    <a href="#" class="btn-hero btn-hero-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/>
+      </svg>
+      Deploy ahora
+    </a>
+    <a href="#demo" class="btn-hero btn-hero-secondary">Ver demo</a>
+  </div>
+
+  <div class="terminal-wrap">
+    <div class="terminal" id="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <div class="terminal-title">trackcloud deploy</div>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <!-- Lines injected by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOS -->
+<div class="logos-section">
+  <p class="logos-label">Usado por equipos de las mejores empresas</p>
+  <div style="overflow:hidden; position:relative;">
+    <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,var(--bg),transparent);z-index:2;pointer-events:none;"></div>
+    <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(-90deg,var(--bg),transparent);z-index:2;pointer-events:none;"></div>
+    <div class="logos-track" id="logosTrack">
+      <div class="logo-item">🏨 TripAdvisor</div>
+      <div class="logo-item">🏢 Cognizant</div>
+      <div class="logo-item">🛒 Mercado Libre</div>
+      <div class="logo-item">⚡ G2X</div>
+      <div class="logo-item">📎 Automattic</div>
+      <div class="logo-item">🏦 Bilt</div>
+      <div class="logo-item">🎰 MGM Resorts</div>
+      <div class="logo-item">💬 Chatbase</div>
+      <div class="logo-item">✈️ Swiss Tourism</div>
+      <div class="logo-item">📊 Numeral</div>
+      <div class="logo-item">🔬 Reducto</div>
+      <div class="logo-item">🏨 TripAdvisor</div>
+      <div class="logo-item">🏢 Cognizant</div>
+      <div class="logo-item">🛒 Mercado Libre</div>
+      <div class="logo-item">⚡ G2X</div>
+      <div class="logo-item">📎 Automattic</div>
+      <div class="logo-item">🏦 Bilt</div>
+      <div class="logo-item">🎰 MGM Resorts</div>
+      <div class="logo-item">💬 Chatbase</div>
+      <div class="logo-item">✈️ Swiss Tourism</div>
+      <div class="logo-item">📊 Numeral</div>
+      <div class="logo-item">🔬 Reducto</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES OVERVIEW -->
+<section id="features" class="reveal">
+  <div class="section-label">Plataforma</div>
+  <h2>Todo lo que necesitas<br>para <em>ship rápido</em></h2>
+  <p class="section-desc">Desde el primer commit hasta producción global, TrackCloud cubre cada paso sin complejidad.</p>
+
+  <div class="features-grid" id="featuresGrid">
+    <div class="feature-card" data-fc="0">
+      <div class="feature-icon" id="fc-icon-0">🚀</div>
+      <h3 id="fc-title-0">Deploy automático</h3>
+      <p id="fc-desc-0">Conecta GitHub, GitLab o Bitbucket. Cada push deploya automáticamente con zero configuración.</p>
+    </div>
+    <div class="feature-card" data-fc="1">
+      <div class="feature-icon" id="fc-icon-1">🌐</div>
+      <h3 id="fc-title-1">Networking instantáneo</h3>
+      <p id="fc-desc-1">SSL, dominios custom, balanceadores de carga y 100 Gbps de red interna desde el primer deploy.</p>
+    </div>
+    <div class="feature-card" data-fc="2">
+      <div class="feature-icon" id="fc-icon-2">📈</div>
+      <h3 id="fc-title-2">Escala automática</h3>
+      <p id="fc-desc-2">De 0 a millones de usuarios. Escala horizontal y vertical según la demanda en tiempo real.</p>
+    </div>
+    <div class="feature-card" data-fc="3">
+      <div class="feature-icon" id="fc-icon-3">📊</div>
+      <h3 id="fc-title-3">Observabilidad total</h3>
+      <p id="fc-desc-3">Logs, métricas y alertas en un solo lugar. Dashboards custom con métricas de cualquier servicio.</p>
+    </div>
+    <div class="feature-card" data-fc="4">
+      <div class="feature-icon" id="fc-icon-4">🔄</div>
+      <h3 id="fc-title-4">Rollbacks en 1 click</h3>
+      <p id="fc-desc-4">¿Algo salió mal? Vuelve a cualquier versión anterior en segundos, sin tiempo de inactividad.</p>
+    </div>
+    <div class="feature-card" data-fc="5">
+      <div class="feature-icon" id="fc-icon-5">🤖</div>
+      <h3 id="fc-title-5">Agentes IA</h3>
+      <p id="fc-desc-5">Detección automática de configuración. Railway lee tu código y configura los ajustes correctos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BIG FEATURE 1: Deploy -->
+<div id="deploy" class="big-feature reveal">
+  <div class="feature-content">
+    <div class="section-label">Build & Deploy</div>
+    <h2>Deploy <em>cualquier cosa</em><br>sin complejidad</h2>
+    <p class="section-desc">Conecta tu repo y TrackCloud se encarga de todo. Auto-configuración, previews instantáneos, sin nuevas herramientas que aprender.</p>
+    <ul class="feature-points">
+      <li>Configuración correcta automáticamente, siempre</li>
+      <li>Canvas visual para ver todo tu stack de un vistazo</li>
+      <li>Edita configuración directamente desde el canvas. YAML opcional</li>
+      <li>Preview de cada PR automáticamente. Sin sorpresas al mergear</li>
+    </ul>
+    <a href="#" class="btn btn-outline">Ver cómo funciona →</a>
+  </div>
+  <div class="feature-visual">
+    <div class="canvas-visual" id="canvasVisual">
+      <!-- Nodes injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- BIG FEATURE 2: Monitoring -->
+<div class="big-feature reverse reveal">
+  <div class="feature-content">
+    <div class="section-label">Monitor & Observar</div>
+    <h2>Logs, métricas y alertas.<br><em>Claridad</em> sin caos</h2>
+    <p class="section-desc">Monitorea el uso de recursos, configura alertas personalizadas y rastrea logs. Visibilidad total desde el momento del deploy.</p>
+    <ul class="feature-points">
+      <li>Dashboards custom con métricas de cualquier servicio</li>
+      <li>Alertas a Slack, Discord o email en el momento que lo especifiques</li>
+      <li>Todos los logs en un lugar. Detecta issues sin cambiar de herramienta</li>
+      <li>Correlación automática entre métricas y deployments</li>
+    </ul>
+    <a href="#" class="btn btn-outline">Ver observabilidad →</a>
+  </div>
+  <div class="feature-visual">
+    <div class="metrics-visual" id="metricsVisual">
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Métricas en tiempo real</span>
+        <span style="font-size:11px;color:var(--green);font-weight:600;">● LIVE</span>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label-row">
+          <span class="metric-label">CPU Usage</span>
+          <span class="metric-value" style="color:var(--green)" id="cpuVal">34%</span>
+        </div>
+        <div class="metric-bar"><div class="metric-fill fill-green" id="cpuBar" style="width:34%"></div></div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label-row">
+          <span class="metric-label">Memory</span>
+          <span class="metric-value" style="color:var(--blue)" id="memVal">67%</span>
+        </div>
+        <div class="metric-bar"><div class="metric-fill fill-blue" id="memBar" style="width:67%"></div></div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label-row">
+          <span class="metric-label">Network I/O</span>
+          <span class="metric-value" style="color:var(--purple)" id="netVal">22%</span>
+        </div>
+        <div class="metric-bar"><div class="metric-fill fill-purple" id="netBar" style="width:22%"></div></div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label-row">
+          <span class="metric-label">Disk I/O</span>
+          <span class="metric-value" style="color:#fbbf24" id="diskVal">45%</span>
+        </div>
+        <div class="metric-bar"><div class="metric-fill fill-yellow" id="diskBar" style="width:45%"></div></div>
+      </div>
+      <div style="margin-top:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);">Requests / hora</span>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)" id="reqCount">1,247</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="miniChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO SECTION -->
+<section id="demo" class="reveal" style="text-align:center;">
+  <div class="section-label">Código</div>
+  <h2>Despliega en <em>minutos</em>,<br>no en días</h2>
+  <p class="section-desc" style="margin:0 auto 48px;">Solo conecta tu repositorio. Nada más.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'tab-github')">GitHub</button>
+    <button class="tab" onclick="switchTab(this, 'tab-docker')">Docker</button>
+    <button class="tab" onclick="switchTab(this, 'tab-cli')">CLI</button>
+  </div>
+
+  <div id="tab-github" class="code-block" style="text-align:left;max-width:600px;margin:0 auto;">
+    <span class="code-comment"># Solo conecta tu repo en el dashboard</span><br>
+    <span class="code-comment"># TrackCloud detecta automáticamente:</span><br>
+    <br>
+    <span class="code-var">framework</span>: <span class="code-string">"Next.js 14"</span><br>
+    <span class="code-var">runtime</span>: <span class="code-string">"Node 20"</span><br>
+    <span class="code-var">build_command</span>: <span class="code-string">"npm run build"</span><br>
+    <span class="code-var">start_command</span>: <span class="code-string">"npm start"</span><br>
+    <span class="code-var">port</span>: <span class="code-string">3000</span><br>
+    <br>
+    <span class="code-comment"># ✅ Deploy exitoso en 47 segundos</span>
+  </div>
+
+  <div id="tab-docker" class="code-block" style="text-align:left;max-width:600px;margin:0 auto;display:none;">
+    <span class="code-keyword">FROM</span> <span class="code-string">node:20-alpine</span><br>
+    <span class="code-keyword">WORKDIR</span> <span class="code-string">/app</span><br>
+    <span class="code-keyword">COPY</span> <span class="code-var">package*.json ./</span><br>
+    <span class="code-keyword">RUN</span> <span class="code-fn">npm ci --production</span><br>
+    <span class="code-keyword">COPY</span> <span class="code-var">. .</span><br>
+    <span class="code-keyword">EXPOSE</span> <span class="code-string">3000</span><br>
+    <span class="code-keyword">CMD</span> [<span class="code-string">"node"</span>, <span class="code-string">"server.js"</span>]<br>
+    <br>
+    <span class="code-comment"># TrackCloud detecta Dockerfile automáticamente</span>
+  </div>
+
+  <div id="tab-cli" class="code-block" style="text-align:left;max-width:600px;margin:0 auto;display:none;">
+    <span class="code-comment"># Instala el CLI</span><br>
+    <span class="code-fn">npm install -g @trackcloud/cli</span><br>
+    <br>
+    <span class="code-comment"># Autentícate</span><br>
+    <span class="code-fn">trackcloud login</span><br>
+    <br>
+    <span class="code-comment"># Deploy desde cualquier directorio</span><br>
+    <span class="code-fn">trackcloud up</span><br>
+    <br>
+    <span class="code-string">✓ Detected: Next.js app</span><br>
+    <span class="code-string">✓ Building... (47s)</span><br>
+    <span class="code-string">✓ Live: https://mi-app.up.trackcloud.app</span>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials-section reveal">
+  <div style="text-align:center;margin-bottom:16px;">
+    <div class="section-label">Testimonios</div>
+    <h2>Amado por<br><em>millones de devs</em></h2>
+  </div>
+
+  <div class="testimonials-grid">
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"En nuestro último día de pico, vimos tráfico de 1,500+ req/seg cumplidos en menos de 50ms. Nuestro equipo técnico está muy impresionado."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">KA</div>
+        <div class="author-info">
+          <div class="author-name">Kartik Aggarwal</div>
+          <div class="author-role">Tech Lead at Bilt</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial" style="border-color:rgba(232,213,163,0.2);">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Servicios que tomaban 1 semana configurar en otros lados, toman 1 día en TrackCloud. El networking complejo simplemente no existe aquí."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">DL</div>
+        <div class="author-info">
+          <div class="author-name">Daniel Lobaton</div>
+          <div class="author-role">CTO at G2X</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Gastábamos $100K/año en AWS. Lo redujimos un 90% mudándonos a TrackCloud y obtenemos una experiencia de developer significativamente mejor."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">AV</div>
+        <div class="author-info">
+          <div class="author-name">Antoine Vulcain</div>
+          <div class="author-role">Founder & CEO at Capitalyze</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Me tomó 2 minutos configurar mi servidor con Postgres usando PostGIS, un volumen, todas las env vars. Una forma muy prolija de organizar las cosas."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">TG</div>
+        <div class="author-info">
+          <div class="author-name">Thales Gelinger</div>
+          <div class="author-role">@thalesgelinger</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Realmente debo elogiar a TrackCloud por permitir límites de gasto duros. Nunca, jamás vi esto en ningún cloud provider. Es muy refrescante."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">KJ</div>
+        <div class="author-info">
+          <div class="author-name">Kevin Jin</div>
+          <div class="author-role">@itskevinjin</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"TrackCloud agiliza y acelera toda nuestra operación. La observabilidad instantánea de servicios y el spin-up de herramientas third-party es casi sin esfuerzo."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">DM</div>
+        <div class="author-info">
+          <div class="author-name">Daniel Moretti</div>
+          <div class="author-role">Co-Founder & CTO at Mappa</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-number" id="stat1">0</div>
+      <div class="stat-label">Usuarios activos</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" id="stat2">0</div>
+      <div class="stat-label">Servicios desplegados</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" id="stat3">0</div>
+      <div class="stat-label">Deploys / mes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" id="stat4">99.99%</div>
+      <div class="stat-label">Uptime garantizado</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="pricing-section" id="pricing">
+  <div class="section-label">Precios</div>
+  <h2>Simple, <em>transparente</em>,<br>sin sorpresas</h2>
+  <p class="section-desc" style="margin:0 auto 16px;">Empieza gratis. Escala cuando lo necesites. Sin costos ocultos.</p>
+
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="plan-name">Hobby</div>
+      <div class="plan-price">$0<span>/mes</span></div>
+      <div class="plan-desc">Para proyectos personales y experimentación. Todo lo que necesitas para comenzar.</div>
+      <ul class="plan-features">
+        <li>512 MB RAM / 0.5 vCPU</li>
+        <li>5 GB de almacenamiento</li>
+        <li>1 proyecto activo</li>
+        <li>Dominios custom (1)</li>
+        <li class="disabled">Environments ilimitados</li>
+        <li class="disabled">Soporte prioritario</li>
+        <li class="disabled">SLA garantizado</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;justify-content:center;">Empezar gratis</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="featured-badge">Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$20<span>/mes</span></div>
+      <div class="plan-desc">Para equipos que construyen productos serios. Escala sin límites de configuración.</div>
+      <ul class="plan-features">
+        <li>8 GB RAM / 8 vCPU</li>
+        <li>100 GB de almacenamiento</li>
+        <li>Proyectos ilimitados</li>
+        <li>Dominios custom ilimitados</li>
+        <li>Environments ilimitados</li>
+        <li>Preview deployments</li>
+        <li class="disabled">SLA empresarial</li>
+      </ul>
+      <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;">Empezar Pro →</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">Custom</div>
+      <div class="plan-desc">Para organizaciones que necesitan control, seguridad y soporte de nivel empresarial.</div>
+      <ul class="plan-features">
+        <li>Recursos ilimitados</li>
+        <li>VPC dedicada</li>
+        <li>SSO / SAML</li>
+        <li>Auditoría y compliance</li>
+        <li>Environments ilimitados</li>
+        <li>Soporte 24/7 dedicado</li>
+        <li>SLA 99.99% garantizado</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;justify-content:center;">Hablar con ventas</a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section reveal">
+  <div class="hero-badge" style="margin:0 auto 32px;">
+    <span class="badge-dot"></span>
+    Listo para embarcar
+  </div>
+  <h2>Un futuro mejor<br>está <em>abordando</em></h2>
+  <p>Deploya tu primer proyecto hoy. Setup en menos de 5 minutos, gratis para siempre en Hobby.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="#" class="btn-hero btn-hero-primary">Deploy ahora →</a>
+    <a href="#" class="btn-hero btn-hero-secondary">Ver documentación</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="font-size:18px;">
+          <svg viewBox="0 0 28 28" fill="none" width="32" height="32">
+            <rect x="2" y="2" width="24" height="24" rx="6" fill="currentColor" opacity="0.1"/>
+            <path d="M7 14L14 7L21 14L14 21L7 14Z" fill="currentColor"/>
+            <circle cx="14" cy="14" r="3" fill="var(--bg)"/>
+          </svg>
+          TrackCloud
+        </a>
+        <p id="footer-tagline">El proveedor cloud inteligente todo-en-uno para equipos que quieren shipear con paz mental.</p>
+      </div>
+      <div class="footer-col" id="fcol-0">
+        <h4 id="fcolh-0">Producto</h4>
+        <ul>
+          <li><a href="#">Deploy</a></li>
+          <li><a href="#">Networking</a></li>
+          <li><a href="#">Escalado</a></li>
+          <li><a href="#">Monitoreo</a></li>
+          <li><a href="#">Agentes IA</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" id="fcol-1">
+        <h4 id="fcolh-1">Developers</h4>
+        <ul>
+          <li><a href="#">Documentación</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">CLI</a></li>
+          <li><a href="#">Templates</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" id="fcol-2">
+        <h4 id="fcolh-2">Empresa</h4>
+        <ul>
+          <li><a href="#">Sobre nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Clientes</a></li>
+          <li><a href="#">Prensa</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" id="fcol-3">
+        <h4 id="fcolh-3">Legal</h4>
+        <ul>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Seguridad</a></li>
+          <li><a href="#">Status</a></li>
+          <li><a href="#">Soporte</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span id="footer-copy">© 2025 TrackCloud, Inc. Todos los derechos reservados.</span>
+      <span id="footer-made">Hecho con ♥ para developers</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── TERMINAL ANIMATION ───
+const termLines = [
+  { type: 'cmd', prompt: '$', text: 'trackcloud deploy --env production' },
+  { type: 'output', text: '  Detectando framework...' },
+  { type: 'info', text: '  ✦ Next.js 14 detectado' },
+  { type: 'output', text: '  Instalando dependencias...' },
+  { type: 'output', text: '  Construyendo aplicación...' },
+  { type: 'info', text: '  ✦ Build completado en 43.2s' },
+  { type: 'output', text: '  Desplegando a producción...' },
+  { type: 'success', text: '  ✓ Deploy exitoso' },
+  { type: 'url', text: '  → https://mi-app.up.trackcloud.app' },
+];
+
+let lineIndex = 0;
+const termBody = document.getElementById('terminalBody');
+
+function addTermLine() {
+  if (lineIndex >= termLines.length) {
+    const cursor = document.createElement('span');
+    cursor.className = 't-cursor';
+    termBody.appendChild(cursor);
+    return;
+  }
+  const l = termLines[lineIndex];
+  const div = document.createElement('div');
+  div.className = 't-line';
+  div.style.animationDelay = '0s';
+
+  let html = '';
+  if (l.type === 'cmd') {
+    html = `<span class="t-prompt">${l.prompt}</span><span class="t-cmd">${l.text}</span>`;
+  } else if (l.type === 'output') {
+    html = `<span class="t-output">${l.text}</span>`;
+  } else if (l.type === 'info') {
+    html = `<span class="t-info">${l.text}</span>`;
+  } else if (l.type === 'success') {
+    html = `<span class="t-success">${l.text}</span>`;
+  } else if (l.type === 'url') {
+    html = `<span class="t-url">${l.text}</span>`;
+  }
+  div.innerHTML = html;
+  termBody.appendChild(div);
+  lineIndex++;
+  setTimeout(addTermLine, lineIndex === 1 ? 500 : 250);
+}
+
+setTimeout(addTermLine, 800);
+
+// ─── NAV SCROLL ───
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+reveals.forEach(el => observer.observe(el));
+
+// ─── CANVAS NODES ───
+const canvasVisual = document.getElementById('canvasVisual');
+const nodes = [
+  { name: 'web-app', meta: 'Next.js · 3 replicas', status: 'status-green', x: 10, y: 10 },
+  { name: 'api-server', meta: 'Express · 2 replicas', status: 'status-blue', x: 55, y: 10 },
+  { name: 'postgres', meta: 'v16 · 1 GB RAM', status: 'status-green', x: 10, y: 55 },
+  { name: 'redis-cache', meta: 'v7.2 · 512 MB', status: 'status-purple', x: 55, y: 55 },
+  { name: 'worker', meta: 'BullMQ · 1 replica', status: 'status-yellow', x: 33, y: 33 },
+];
+
+nodes.forEach(n => {
+  const el = document.createElement('div');
+  el.className = 'canvas-node';
+  el.style.cssText = `left:${n.x}%;top:${n.y}%;`;
+  el.innerHTML = `
+    <div class="canvas-node-header">
+      <div class="node-status ${n.status}"></div>
+      <span class="node-name">${n.name}</span>
+    </div>
+    <div class="node-meta">${n.meta}</div>
+  `;
+  canvasVisual.appendChild(el);
+});
+
+// ─── ANIMATED METRICS ───
+function animateMetrics() {
+  const metrics = [
+    { val: 'cpuVal', bar: 'cpuBar', base: 30, range: 40 },
+    { val: 'memVal', bar: 'memBar', base: 55, range: 25 },
+    { val: 'netVal', bar: 'netBar', base: 15, range: 35 },
+    { val: 'diskVal', bar: 'diskBar', base: 40, range: 20 },
+  ];
+  metrics.forEach(m => {
+    const pct = Math.floor(m.base + Math.random() * m.range);
+    const valEl = document.getElementById(m.val);
+    const barEl = document.getElementById(m.bar);
+    if (valEl) valEl.textContent = pct + '%';
+    if (barEl) barEl.style.width = pct + '%';
+  });
+  const req = (1000 + Math.floor(Math.random() * 500)).toLocaleString();
+  const reqEl = document.getElementById('reqCount');
+  if (reqEl) reqEl.textContent = req;
+}
+
+setInterval(animateMetrics, 2000);
+
+// ─── MINI SPARKLINE CHART ───
+function drawChart() {
+  const canvas = document.getElementById('miniChart');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+  const w = canvas.offsetWidth / 2;
+  const h = canvas.offsetHeight / 2;
+
+  const pts = [];
+  for (let i = 0; i < 20; i++) {
+    pts.push(20 + Math.random() * 60);
+  }
+
+  ctx.clearRect(0, 0, w, h);
+
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(96,165,250,0.3)');
+  grad.addColorStop(1, 'rgba(96,165,250,0)');
+
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const x = (i / (pts.length - 1)) * w;
+    const y = h - (p / 100) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  const lastX = w, lastY = h - (pts[pts.length-1] / 100) * h;
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const x = (i / (pts.length - 1)) * w;
+    const y = h - (p / 100) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = 'rgba(96,165,250,0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+setInterval(() => {
+  drawChart();
+}, 2000);
+
+window.addEventListener('load', () => setTimeout(drawChart, 500));
+window.addEventListener('resize', drawChart);
+
+// ─── STATS COUNTER ───
+function animateCount(el, target, suffix = '', duration = 2000) {
+  if (!el) return;
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(ease * target);
+    el.textContent = current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCount(document.getElementById('stat1'), 2425024);
+      animateCount(document.getElementById('stat2'), 7504892);
+      animateCount(document.getElementById('stat3'), 36740798);
+      statsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+
+const statsEl = document.querySelector('.stats-section');
+if (statsEl) statsObserver.observe(statsEl);
+
+// ─── METRIC BARS ANIMATE ON SCROLL ───
+const metricsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.metric-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => { bar.style.width = w; }, 100);
+      });
+      metricsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+
+const metricsEl = document.getElementById('metricsVisual');
+if (metricsEl) metricsObserver.observe(metricsEl);
+
+// ─── TABS ───
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['tab-github', 'tab-docker', 'tab-cli'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === tabId ? 'block' : 'none';
+  });
+}
+
+// ─── MOBILE MENU ───
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  if (links.style.display === 'flex') {
+    links.style.display = 'none';
+  } else {
+    links.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 56px;
+      left: 0; right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+      z-index: 99;
+    `;
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADMIN PANEL SYSTEM
+═══════════════════════════════════════════════════════════ -->
+<style>
+/* ─── ADMIN FLOATING BUTTON ─── */
+#adminBtn {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 9000;
+  width: 52px; height: 52px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  color: #9a9590;
+}
+#adminBtn:hover { background: #222; border-color: #c4a46b; color: #c4a46b; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.7); }
+
+/* ─── OVERLAY ─── */
+.admin-overlay {
+  position: fixed; inset: 0; z-index: 9001;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.admin-overlay.open { display: flex; }
+
+/* ─── LOGIN BOX ─── */
+.admin-login {
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 16px;
+  padding: 48px;
+  width: 100%; max-width: 400px;
+  text-align: center;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
+
+.admin-login h2 {
+  font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+  margin-bottom: 6px; color: #f0ede8;
+}
+.admin-login p { font-size: 13px; color: #5a5550; margin-bottom: 32px; }
+
+.admin-field {
+  display: flex; flex-direction: column; gap: 6px;
+  text-align: left; margin-bottom: 16px;
+}
+.admin-field label { font-size: 12px; font-weight: 600; color: #5a5550; letter-spacing: 0.06em; text-transform: uppercase; }
+.admin-field input {
+  background: #161616; border: 1px solid #242424; border-radius: 8px;
+  padding: 10px 14px; color: #f0ede8; font-size: 14px;
+  font-family: 'Geist', sans-serif; outline: none; transition: border-color 0.2s;
+}
+.admin-field input:focus { border-color: #c4a46b; }
+
+.admin-error {
+  font-size: 13px; color: #f87171; background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 16px; display: none;
+}
+
+.btn-admin-login {
+  width: 100%; padding: 12px; background: #f0ede8; color: #0a0a0a;
+  border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: 'Geist', sans-serif; transition: all 0.2s;
+}
+.btn-admin-login:hover { background: #e8d5a3; }
+
+.admin-close-login {
+  margin-top: 16px; font-size: 13px; color: #5a5550; cursor: pointer;
+  background: none; border: none; font-family: 'Geist', sans-serif; transition: color 0.2s;
+}
+.admin-close-login:hover { color: #9a9590; }
+
+/* ─── ADMIN PANEL ─── */
+.admin-panel {
+  background: #0e0e0e;
+  border: 1px solid #2e2e2e;
+  border-radius: 16px;
+  width: 100%; max-width: 860px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.panel-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex; align-items: center; justify-content: space-between;
+  background: #111;
+  flex-shrink: 0;
+}
+.panel-header-left { display: flex; align-items: center; gap: 12px; }
+.panel-title { font-size: 15px; font-weight: 700; color: #f0ede8; letter-spacing: -0.01em; }
+.panel-user { font-size: 12px; color: #5a5550; }
+.panel-badge {
+  background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2);
+  color: #4ade80; font-size: 11px; font-weight: 600; padding: 3px 10px;
+  border-radius: 100px; display: flex; align-items: center; gap: 6px;
+}
+.panel-badge::before { content:''; width:6px; height:6px; background:#4ade80; border-radius:50%; animation: pulse 2s infinite; }
+
+.panel-close {
+  width: 32px; height: 32px; background: #1a1a1a; border: 1px solid #2e2e2e;
+  border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #9a9590; transition: all 0.2s; font-size: 16px;
+}
+.panel-close:hover { background: #222; color: #f0ede8; }
+
+/* ─── PANEL TABS ─── */
+.panel-tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid #1e1e1e;
+  background: #0e0e0e;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.panel-tab {
+  padding: 13px 22px; font-size: 13px; font-weight: 500;
+  color: #5a5550; cursor: pointer; border: none; background: none;
+  font-family: 'Geist', sans-serif; border-bottom: 2px solid transparent;
+  transition: all 0.2s; white-space: nowrap;
+}
+.panel-tab:hover { color: #9a9590; }
+.panel-tab.active { color: #f0ede8; border-bottom-color: #c4a46b; }
+
+/* ─── PANEL BODY ─── */
+.panel-body {
+  padding: 28px; overflow-y: auto; flex: 1;
+}
+.panel-section { display: none; }
+.panel-section.active { display: block; }
+
+/* ─── EDIT ROWS ─── */
+.edit-group { margin-bottom: 32px; }
+.edit-group-title {
+  font-size: 11px; font-weight: 700; color: #5a5550;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 1px solid #1e1e1e;
+}
+.edit-row {
+  display: grid; grid-template-columns: 160px 1fr auto;
+  gap: 12px; align-items: center; margin-bottom: 10px;
+}
+.edit-label { font-size: 13px; color: #9a9590; font-weight: 500; }
+.edit-input {
+  background: #161616; border: 1px solid #242424; border-radius: 8px;
+  padding: 9px 12px; color: #f0ede8; font-size: 13px;
+  font-family: 'Geist', sans-serif; outline: none; transition: border-color 0.2s;
+}
+.edit-input:focus { border-color: #c4a46b; }
+.edit-textarea {
+  background: #161616; border: 1px solid #242424; border-radius: 8px;
+  padding: 9px 12px; color: #f0ede8; font-size: 13px;
+  font-family: 'Geist', sans-serif; outline: none; resize: vertical;
+  min-height: 70px; transition: border-color 0.2s;
+}
+.edit-textarea:focus { border-color: #c4a46b; }
+.btn-apply {
+  background: rgba(196,164,107,0.1); border: 1px solid rgba(196,164,107,0.3);
+  color: #c4a46b; border-radius: 7px; padding: 8px 14px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: 'Geist', sans-serif; transition: all 0.2s; white-space: nowrap;
+}
+.btn-apply:hover { background: rgba(196,164,107,0.18); }
+
+/* ─── TESTIMONIALS EDITOR ─── */
+.testimonial-edit-card {
+  background: #161616; border: 1px solid #242424; border-radius: 10px;
+  padding: 20px; margin-bottom: 12px;
+}
+.testimonial-edit-card h4 { font-size: 12px; color: #5a5550; margin-bottom: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+.t-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+/* ─── PRICING EDITOR ─── */
+.pricing-edit-card {
+  background: #161616; border: 1px solid #242424; border-radius: 10px;
+  padding: 20px; margin-bottom: 12px;
+}
+.pricing-edit-card h4 { font-size: 12px; color: #c4a46b; margin-bottom: 14px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700; }
+.price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ─── STATS EDITOR ─── */
+.stats-edit-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
+}
+.stat-edit-card {
+  background: #161616; border: 1px solid #242424; border-radius: 10px; padding: 16px;
+}
+.stat-edit-card label { font-size: 11px; color: #5a5550; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.stat-edit-card input {
+  background: #111; border: 1px solid #2e2e2e; border-radius: 7px;
+  padding: 8px 10px; color: #f0ede8; font-size: 14px; font-weight: 700;
+  font-family: 'Geist', sans-serif; outline: none; width: 100%; transition: border-color 0.2s;
+}
+.stat-edit-card input:focus { border-color: #c4a46b; }
+
+/* ─── TOAST ─── */
+.admin-toast {
+  position: fixed; bottom: 90px; right: 28px; z-index: 9999;
+  background: #1a1a1a; border: 1px solid rgba(74,222,128,0.3);
+  color: #4ade80; font-size: 13px; font-weight: 600;
+  padding: 12px 20px; border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.admin-toast.show { transform: translateY(0); opacity: 1; }
+
+/* ─── SAVE BAR ─── */
+.panel-save-bar {
+  padding: 16px 28px;
+  border-top: 1px solid #1e1e1e;
+  background: #111;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.panel-save-bar span { font-size: 12px; color: #5a5550; }
+.btn-save-all {
+  background: #f0ede8; color: #0a0a0a;
+  border: none; border-radius: 8px; padding: 10px 24px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Geist', sans-serif; transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-save-all:hover { background: #e8d5a3; transform: translateY(-1px); }
+.btn-logout {
+  background: transparent; border: 1px solid #2e2e2e; color: #5a5550;
+  border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: 'Geist', sans-serif; transition: all 0.2s;
+}
+.btn-logout:hover { border-color: #f87171; color: #f87171; }
+
+@media (max-width: 600px) {
+  .edit-row { grid-template-columns: 1fr; }
+  .t-edit-grid, .price-grid, .stats-edit-row { grid-template-columns: 1fr; }
+  .admin-login { padding: 32px 24px; }
+}
+</style>
+
+<!-- FLOATING ADMIN BUTTON -->
+<button id="adminBtn" onclick="openAdmin()" title="Panel Administrador">
+  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+  </svg>
+</button>
+
+<!-- TOAST -->
+<div class="admin-toast" id="adminToast">
+  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+  </svg>
+  <span id="toastMsg">Cambios guardados</span>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay">
+
+  <!-- LOGIN -->
+  <div class="admin-login" id="adminLogin">
+    <div style="width:48px;height:48px;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#c4a46b" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h2>Panel Administrador</h2>
+    <p>Acceso restringido · TrackCloud Admin</p>
+    <div class="admin-error" id="loginError">Usuario o contraseña incorrectos</div>
+    <div class="admin-field">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="elparivera" autocomplete="username"/>
+    </div>
+    <div class="admin-field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn-admin-login" onclick="doLogin()">Ingresar al panel →</button>
+    <button class="admin-close-login" onclick="closeAdmin()">Cancelar</button>
+  </div>
+
+  <!-- PANEL -->
+  <div class="admin-panel" id="adminPanel" style="display:none;">
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div style="width:36px;height:36px;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:9px;display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c4a46b" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="panel-title">Panel Administrador</div>
+          <div class="panel-user">Sesión: elparivera</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="panel-badge">Admin activo</div>
+        <button class="panel-close" onclick="closeAdmin()">✕</button>
+      </div>
+    </div>
+
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchPanelTab(this,'ptab-textos')">✏️ Textos</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-precios')">💰 Precios</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-testimonios')">💬 Testimonios</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-stats')">📊 Estadísticas</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-colores')">🎨 Apariencia</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-features')">⚡ Features</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-footer')">🦶 Footer</button>
+      <button class="panel-tab" onclick="switchPanelTab(this,'ptab-logo')">🖼️ Logo</button>
+    </div>
+
+    <div class="panel-body">
+
+      <!-- TAB: TEXTOS -->
+      <div class="panel-section active" id="ptab-textos">
+        <div class="edit-group">
+          <div class="edit-group-title">Hero Principal</div>
+          <div class="edit-row">
+            <span class="edit-label">Título línea 1</span>
+            <input class="edit-input" id="e-hero1" value="Deploy con"/>
+            <button class="btn-apply" onclick="applyText('e-hero1','hero-line1')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Título cursiva</span>
+            <input class="edit-input" id="e-hero2" value="total paz"/>
+            <button class="btn-apply" onclick="applyText('e-hero2','hero-line2')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Título línea 3</span>
+            <input class="edit-input" id="e-hero3" value="mental"/>
+            <button class="btn-apply" onclick="applyText('e-hero3','hero-line3')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Subtítulo hero</span>
+            <input class="edit-input" id="e-herosub" value="El proveedor cloud inteligente todo-en-uno. Conecta tu repo y TrackCloud hace el resto."/>
+            <button class="btn-apply" onclick="applyText('e-herosub','hero-subtitle')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Badge hero</span>
+            <input class="edit-input" id="e-badge" value="Nuevo: Agentes de IA integrados"/>
+            <button class="btn-apply" onclick="applyText('e-badge','hero-badge-text')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Btn principal</span>
+            <input class="edit-input" id="e-cta1" value="Deploy ahora"/>
+            <button class="btn-apply" onclick="applyText('e-cta1','hero-cta1')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Btn secundario</span>
+            <input class="edit-input" id="e-cta2" value="Ver demo"/>
+            <button class="btn-apply" onclick="applyText('e-cta2','hero-cta2')">Aplicar</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Sección Features</div>
+          <div class="edit-row">
+            <span class="edit-label">Título</span>
+            <input class="edit-input" id="e-feat-title" value="Todo lo que necesitas para ship rápido"/>
+            <button class="btn-apply" onclick="applyText('e-feat-title','feat-main-title')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Descripción</span>
+            <input class="edit-input" id="e-feat-desc" value="Desde el primer commit hasta producción global, TrackCloud cubre cada paso sin complejidad."/>
+            <button class="btn-apply" onclick="applyText('e-feat-desc','feat-main-desc')">Aplicar</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Nombre del producto</div>
+          <div class="edit-row">
+            <span class="edit-label">Nombre del sitio</span>
+            <input class="edit-input" id="e-sitename" value="TrackCloud"/>
+            <button class="btn-apply" onclick="applySiteName()">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Tagline nav</span>
+            <input class="edit-input" id="e-tagline" value="The all-in-one intelligent cloud provider"/>
+            <button class="btn-apply" onclick="applyTagline()">Aplicar</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">CTA Final</div>
+          <div class="edit-row">
+            <span class="edit-label">Título CTA</span>
+            <input class="edit-input" id="e-cta-title" value="Un futuro mejor está abordando"/>
+            <button class="btn-apply" onclick="applyText('e-cta-title','cta-main-title')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Descripción CTA</span>
+            <input class="edit-input" id="e-cta-desc" value="Deploya tu primer proyecto hoy. Setup en menos de 5 minutos, gratis para siempre en Hobby."/>
+            <button class="btn-apply" onclick="applyText('e-cta-desc','cta-main-desc')">Aplicar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: PRECIOS -->
+      <div class="panel-section" id="ptab-precios">
+        <div class="edit-group">
+          <div class="edit-group-title">Plan Hobby</div>
+          <div class="pricing-edit-card">
+            <h4>Hobby</h4>
+            <div class="price-grid">
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Nombre del plan</label>
+                <input class="edit-input" id="p1-name" value="Hobby" style="width:100%"/>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Precio</label>
+                <input class="edit-input" id="p1-price" value="$0" style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Descripción</label>
+                <input class="edit-input" id="p1-desc" value="Para proyectos personales y experimentación." style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Texto del botón</label>
+                <input class="edit-input" id="p1-btn" value="Empezar gratis" style="width:100%"/>
+              </div>
+            </div>
+            <button class="btn-apply" style="margin-top:14px;" onclick="applyPlan(0)">Aplicar cambios</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Plan Pro</div>
+          <div class="pricing-edit-card" style="border-color:rgba(196,164,107,0.2);">
+            <h4>Pro ⭐</h4>
+            <div class="price-grid">
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Nombre del plan</label>
+                <input class="edit-input" id="p2-name" value="Pro" style="width:100%"/>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Precio</label>
+                <input class="edit-input" id="p2-price" value="$20" style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Descripción</label>
+                <input class="edit-input" id="p2-desc" value="Para equipos que construyen productos serios." style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Texto del botón</label>
+                <input class="edit-input" id="p2-btn" value="Empezar Pro →" style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Badge (ej: Popular)</label>
+                <input class="edit-input" id="p2-badge" value="Popular" style="width:100%"/>
+              </div>
+            </div>
+            <button class="btn-apply" style="margin-top:14px;" onclick="applyPlan(1)">Aplicar cambios</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Plan Enterprise</div>
+          <div class="pricing-edit-card">
+            <h4>Enterprise</h4>
+            <div class="price-grid">
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Nombre del plan</label>
+                <input class="edit-input" id="p3-name" value="Enterprise" style="width:100%"/>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Precio</label>
+                <input class="edit-input" id="p3-price" value="Custom" style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Descripción</label>
+                <input class="edit-input" id="p3-desc" value="Para organizaciones que necesitan control y seguridad." style="width:100%"/>
+              </div>
+              <div style="grid-column:1/-1;">
+                <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Texto del botón</label>
+                <input class="edit-input" id="p3-btn" value="Hablar con ventas" style="width:100%"/>
+              </div>
+            </div>
+            <button class="btn-apply" style="margin-top:14px;" onclick="applyPlan(2)">Aplicar cambios</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TESTIMONIOS -->
+      <div class="panel-section" id="ptab-testimonios">
+        <div id="testimoniosEditor"></div>
+      </div>
+
+      <!-- TAB: STATS -->
+      <div class="panel-section" id="ptab-stats">
+        <div class="edit-group">
+          <div class="edit-group-title">Contadores de estadísticas</div>
+          <div class="stats-edit-row">
+            <div class="stat-edit-card">
+              <label>Usuarios activos</label>
+              <input type="text" id="s-stat1" value="2,425,024" onchange="applyStatLabel('stat1',this.value)"/>
+              <div style="font-size:11px;color:#5a5550;margin-top:6px;">Número que se muestra en pantalla</div>
+            </div>
+            <div class="stat-edit-card">
+              <label>Servicios desplegados</label>
+              <input type="text" id="s-stat2" value="7,504,892" onchange="applyStatLabel('stat2',this.value)"/>
+            </div>
+            <div class="stat-edit-card">
+              <label>Deploys / mes</label>
+              <input type="text" id="s-stat3" value="36,740,798" onchange="applyStatLabel('stat3',this.value)"/>
+            </div>
+            <div class="stat-edit-card">
+              <label>Uptime</label>
+              <input type="text" id="s-stat4" value="99.99%" onchange="document.getElementById('stat4').textContent=this.value"/>
+            </div>
+          </div>
+          <button class="btn-apply" style="margin-top:8px;" onclick="applyAllStats()">Aplicar todas las estadísticas</button>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Etiquetas de estadísticas</div>
+          <div class="edit-row">
+            <span class="edit-label">Label stat 1</span>
+            <input class="edit-input" id="sl-1" value="Usuarios activos"/>
+            <button class="btn-apply" onclick="applyStatLabelText(0,document.getElementById('sl-1').value)">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Label stat 2</span>
+            <input class="edit-input" id="sl-2" value="Servicios desplegados"/>
+            <button class="btn-apply" onclick="applyStatLabelText(1,document.getElementById('sl-2').value)">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Label stat 3</span>
+            <input class="edit-input" id="sl-3" value="Deploys / mes"/>
+            <button class="btn-apply" onclick="applyStatLabelText(2,document.getElementById('sl-3').value)">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Label stat 4</span>
+            <input class="edit-input" id="sl-4" value="Uptime garantizado"/>
+            <button class="btn-apply" onclick="applyStatLabelText(3,document.getElementById('sl-4').value)">Aplicar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: APARIENCIA -->
+      <div class="panel-section" id="ptab-colores">
+        <div class="edit-group">
+          <div class="edit-group-title">Colores del sitio</div>
+          <div class="edit-row">
+            <span class="edit-label">Color de acento</span>
+            <input type="color" id="c-accent" value="#e8d5a3" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--accent',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Color de acento aplicado')">✓</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Acento secundario</span>
+            <input type="color" id="c-accent2" value="#c4a46b" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--accent2',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Color aplicado')">✓</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Color verde</span>
+            <input type="color" id="c-green" value="#4ade80" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--green',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Color aplicado')">✓</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Color azul</span>
+            <input type="color" id="c-blue" value="#60a5fa" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--blue',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Color aplicado')">✓</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Fondo principal</span>
+            <input type="color" id="c-bg" value="#0a0a0a" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--bg',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Fondo aplicado')">✓</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Color de texto</span>
+            <input type="color" id="c-text" value="#f0ede8" style="width:60px;height:36px;border-radius:8px;border:1px solid #2e2e2e;background:#161616;cursor:pointer;" oninput="applyCSSVar('--text',this.value)"/>
+            <button class="btn-apply" onclick="showToast('Color de texto aplicado')">✓</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Resetear colores</div>
+          <button class="btn-apply" onclick="resetColors()" style="padding:10px 20px;">↩ Restaurar colores originales</button>
+        </div>
+      </div>
+
+
+      <!-- TAB: FEATURES CARDS -->
+      <div class="panel-section" id="ptab-features">
+        <div class="edit-group">
+          <div class="edit-group-title">Las 6 feature cards</div>
+          <div id="featCardsEditor"></div>
+        </div>
+      </div>
+
+      <!-- TAB: FOOTER -->
+      <div class="panel-section" id="ptab-footer">
+        <div class="edit-group">
+          <div class="edit-group-title">Marca del footer</div>
+          <div class="edit-row">
+            <span class="edit-label">Tagline</span>
+            <input class="edit-input" id="f-tagline" value="El proveedor cloud inteligente todo-en-uno para equipos que quieren shipear con paz mental."/>
+            <button class="btn-apply" onclick="applyFooter('footer-tagline','f-tagline')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Copyright</span>
+            <input class="edit-input" id="f-copy" value="© 2025 TrackCloud, Inc. Todos los derechos reservados."/>
+            <button class="btn-apply" onclick="applyFooter('footer-copy','f-copy')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Slogan bottom</span>
+            <input class="edit-input" id="f-made" value="Hecho con ♥ para developers"/>
+            <button class="btn-apply" onclick="applyFooter('footer-made','f-made')">Aplicar</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Títulos de columnas</div>
+          <div class="edit-row">
+            <span class="edit-label">Columna 1</span>
+            <input class="edit-input" id="fch-0" value="Producto"/>
+            <button class="btn-apply" onclick="applyFooter('fcolh-0','fch-0')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Columna 2</span>
+            <input class="edit-input" id="fch-1" value="Developers"/>
+            <button class="btn-apply" onclick="applyFooter('fcolh-1','fch-1')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Columna 3</span>
+            <input class="edit-input" id="fch-2" value="Empresa"/>
+            <button class="btn-apply" onclick="applyFooter('fcolh-2','fch-2')">Aplicar</button>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Columna 4</span>
+            <input class="edit-input" id="fch-3" value="Legal"/>
+            <button class="btn-apply" onclick="applyFooter('fcolh-3','fch-3')">Aplicar</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Links de columnas (uno por línea)</div>
+          <div id="footerLinksEditor"></div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Links del nav principal</div>
+          <div id="navLinksEditor"></div>
+        </div>
+      </div>
+
+      <!-- TAB: LOGO -->
+      <div class="panel-section" id="ptab-logo">
+        <div class="edit-group">
+          <div class="edit-group-title">Logo del sitio</div>
+          <div style="background:#161616;border:1px solid #242424;border-radius:10px;padding:24px;margin-bottom:16px;text-align:center;">
+            <div style="font-size:12px;color:#5a5550;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Vista previa del logo actual</div>
+            <div id="logo-preview" style="display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:#f0ede8;"></div>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Subir imagen de logo</label>
+            <div style="border:2px dashed #2e2e2e;border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;" id="logoDropZone" onclick="document.getElementById('logoFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='#c4a46b'" ondragleave="this.style.borderColor='#2e2e2e'" ondrop="handleLogoDrop(event)">
+              <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+              <div style="font-size:13px;color:#9a9590;margin-bottom:4px;">Arrastrá tu logo aquí o hacé clic</div>
+              <div style="font-size:11px;color:#5a5550;">PNG, JPG, SVG, WebP · Recomendado: 120×40px</div>
+              <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)"/>
+            </div>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">Nombre del logo</span>
+            <input class="edit-input" id="logo-name-input" value="TrackCloud"/>
+            <button class="btn-apply" onclick="applyLogoName()">Aplicar</button>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-apply" onclick="resetLogo()" style="padding:10px 20px;">↩ Restaurar logo original</button>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Favicon (ícono del navegador)</div>
+          <div style="border:2px dashed #2e2e2e;border-radius:10px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('faviconInput').click()">
+            <div style="font-size:22px;margin-bottom:6px;">🔖</div>
+            <div style="font-size:13px;color:#9a9590;">Subir favicon · PNG, ICO · 32×32px recomendado</div>
+            <input type="file" id="faviconInput" accept="image/*" style="display:none" onchange="handleFaviconUpload(this)"/>
+          </div>
+        </div>
+        <div class="edit-group">
+          <div class="edit-group-title">Hero — Imagen de fondo</div>
+          <div style="border:2px dashed #2e2e2e;border-radius:10px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('heroBgInput').click()">
+            <div style="font-size:22px;margin-bottom:6px;">🌄</div>
+            <div style="font-size:13px;color:#9a9590;">Subir imagen de fondo para el hero</div>
+            <div style="font-size:11px;color:#5a5550;margin-top:4px;">Recomendado: 1920×1080px o mayor</div>
+            <input type="file" id="heroBgInput" accept="image/*" style="display:none" onchange="handleHeroBgUpload(this)"/>
+          </div>
+          <button class="btn-apply" style="margin-top:12px;" onclick="resetHeroBg()">↩ Remover imagen de fondo</button>
+        </div>
+      </div>
+
+    </div><!-- /panel-body -->
+
+    <div class="panel-save-bar">
+      <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+      <span id="save-bar-status">Listo para publicar</span>
+      <button class="btn-save-all" onclick="pushToGitHub()" id="btn-publish" style="background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.35);color:#4ade80;min-width:180px;">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>
+        </svg>
+        <span id="btn-publish-text">Guardar y publicar en línea</span>
+      </button>
+    </div>
+  </div><!-- /admin-panel -->
+
+<!-- ─── MODAL CONFIGURAR TOKEN ─── -->
+<div id="tokenModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#111;border:1px solid #2e2e2e;border-radius:16px;padding:40px;width:100%;max-width:480px;box-shadow:0 40px 80px rgba(0,0,0,0.9);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="font-size:24px;">🔑</div>
+      <h3 style="font-size:18px;font-weight:700;color:#f0ede8;letter-spacing:-0.02em;">Conectar con GitHub</h3>
+    </div>
+    <p style="font-size:13px;color:#5a5550;margin-bottom:24px;line-height:1.6;">Necesitas un token de GitHub para que los cambios se publiquen automáticamente en tu página.</p>
+    <div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:10px;padding:16px;margin-bottom:20px;font-size:12px;color:#9a9590;line-height:2;">
+      <div>1. Ve a <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#60a5fa;">github.com/settings/tokens/new</a></div>
+      <div>2. Note: <code style="color:#c4a46b;">TrackCloud Admin</code> &nbsp;|&nbsp; Expiration: <code style="color:#c4a46b;">No expiration</code></div>
+      <div>3. Marca solo el scope: <code style="color:#4ade80;">✅ repo</code></div>
+      <div>4. Clic en <strong style="color:#f0ede8;">Generate token</strong> y cópialo aquí</div>
+    </div>
+    <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Token de GitHub (ghp_...)</label>
+    <input id="githubTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+      style="width:100%;background:#161616;border:1px solid #242424;border-radius:8px;padding:11px 14px;color:#f0ede8;font-size:13px;font-family:'DM Mono',monospace;outline:none;margin-bottom:16px;transition:border-color 0.2s;"
+      onfocus="this.style.borderColor='#c4a46b'" onblur="this.style.borderColor='#242424'"/>
+    <div id="tokenError" style="display:none;font-size:12px;color:#f87171;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveGitHubToken()" style="flex:1;padding:12px;background:#f0ede8;color:#0a0a0a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Geist',sans-serif;transition:all 0.2s;" onmouseover="this.style.background='#e8d5a3'" onmouseout="this.style.background='#f0ede8'">
+        Guardar token y publicar
+      </button>
+      <button onclick="closeTokenModal()" style="padding:12px 20px;background:transparent;color:#5a5550;border:1px solid #2e2e2e;border-radius:8px;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif;transition:all 0.2s;" onmouseover="this.style.color='#9a9590'" onmouseout="this.style.color='#5a5550'">
+        Cancelar
+      </button>
+    </div>
+    <p style="font-size:11px;color:#3a3530;margin-top:14px;text-align:center;">El token se guarda solo en tu navegador, nunca se envía a terceros.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// ADMIN PANEL LOGIC
+// ═══════════════════════════════════════
+const ADMIN_USER = 'elparivera';
+const ADMIN_PASS = 'Wriverd12345';
+let adminLoggedIn = false;
+
+// ─── IDs para edición ───
+// Añadir IDs a elementos clave de la página
+(function injectIds() {
+  // Hero
+  const h1 = document.querySelector('.hero h1');
+  if (h1) {
+    const lines = h1.innerHTML.split('<br>');
+    h1.innerHTML = `<span id="hero-line1">${lines[0] || 'Deploy con'}</span><br><em class="h1-italic" id="hero-line2">total paz</em><br><span id="hero-line3">${(lines[2]||'mental').replace(/<[^>]+>/g,'')}</span>`;
+  }
+  const sub = document.querySelector('.hero-sub');
+  if (sub) sub.id = 'hero-subtitle';
+  const badge = document.querySelector('.hero-badge');
+  if (badge) {
+    const dot = badge.querySelector('.badge-dot');
+    badge.innerHTML = '';
+    if (dot) badge.appendChild(dot);
+    const t = document.createElement('span');
+    t.id = 'hero-badge-text';
+    t.textContent = 'Nuevo: Agentes de IA integrados';
+    badge.appendChild(t);
+  }
+  // CTA btns
+  const heroActions = document.querySelector('.hero-actions');
+  if (heroActions) {
+    const btns = heroActions.querySelectorAll('a');
+    if (btns[0]) btns[0].id = 'hero-cta1';
+    if (btns[1]) btns[1].id = 'hero-cta2';
+  }
+  // Features section
+  const featH2 = document.querySelector('#features h2');
+  if (featH2) featH2.id = 'feat-main-title';
+  const featDesc = document.querySelector('#features .section-desc');
+  if (featDesc) featDesc.id = 'feat-main-desc';
+  // CTA section
+  const ctaSect = document.querySelector('.cta-section');
+  if (ctaSect) {
+    const ctaH2 = ctaSect.querySelector('h2');
+    if (ctaH2) ctaH2.id = 'cta-main-title';
+    const ctaP = ctaSect.querySelector('p');
+    if (ctaP) ctaP.id = 'cta-main-desc';
+  }
+  // Nav logo text
+  const navLogos = document.querySelectorAll('.nav-logo');
+  navLogos.forEach((n,i) => { if(i===0) n.id='nav-logo-text'; });
+})();
+
+function openAdmin() {
+  document.getElementById('adminOverlay').classList.add('open');
+  if (adminLoggedIn) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'flex';
+  } else {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+}
+
+function closeAdmin() {
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+
+document.getElementById('adminOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAdmin();
+});
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    adminLoggedIn = true;
+    err.style.display = 'none';
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'flex';
+    buildTestimoniosEditor();
+    showToast('Bienvenido, ' + ADMIN_USER + ' ✓');
+  } else {
+    err.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    document.getElementById('adminLogin').style.animation = 'none';
+    setTimeout(() => {
+      document.getElementById('adminLogin').style.animation = 'shake 0.4s ease';
+    }, 10);
+  }
+}
+
+function doLogout() {
+  adminLoggedIn = false;
+  closeAdmin();
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  showToast('Sesión cerrada');
+}
+
+// ─── PANEL TABS ───
+function switchPanelTab(btn, tabId) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ─── APPLY TEXT ───
+function applyText(inputId, targetId) {
+  const val = document.getElementById(inputId).value;
+  const el = document.getElementById(targetId);
+  if (el) {
+    el.textContent = val;
+    showToast('Texto actualizado ✓');
+  } else {
+    showToast('Elemento no encontrado', true);
+  }
+}
+
+function applySiteName() {
+  const val = document.getElementById('e-sitename').value;
+  document.querySelectorAll('.nav-logo').forEach(el => {
+    const svg = el.querySelector('svg');
+    el.textContent = val;
+    if (svg) el.prepend(svg);
+  });
+  document.title = val + ' — The all-in-one intelligent cloud provider';
+  showToast('Nombre del sitio actualizado ✓');
+}
+
+function applyTagline() {
+  const val = document.getElementById('e-tagline').value;
+  document.title = (document.getElementById('e-sitename').value || 'TrackCloud') + ' — ' + val;
+  showToast('Tagline actualizado ✓');
+}
+
+// ─── PRICING ───
+function applyPlan(idx) {
+  const cards = document.querySelectorAll('.pricing-card');
+  if (!cards[idx]) return;
+  const card = cards[idx];
+  const names = ['p1','p2','p3'];
+  const prefix = names[idx];
+  const nameVal = document.getElementById(prefix+'-name').value;
+  const priceVal = document.getElementById(prefix+'-price').value;
+  const descVal = document.getElementById(prefix+'-desc').value;
+  const btnVal = document.getElementById(prefix+'-btn').value;
+  const nameEl = card.querySelector('.plan-name');
+  if (nameEl) nameEl.textContent = nameVal;
+  const priceEl = card.querySelector('.plan-price');
+  if (priceEl) {
+    const span = priceEl.querySelector('span');
+    const spanText = span ? span.outerHTML : '';
+    priceEl.innerHTML = priceVal + spanText;
+  }
+  const descEl = card.querySelector('.plan-desc');
+  if (descEl) descEl.textContent = descVal;
+  const btnEl = card.querySelector('a');
+  if (btnEl) btnEl.textContent = btnVal;
+  if (idx === 1) {
+    const badgeEl = card.querySelector('.featured-badge');
+    const badgeVal = document.getElementById('p2-badge').value;
+    if (badgeEl) badgeEl.textContent = badgeVal;
+  }
+  showToast('Plan ' + nameVal + ' actualizado ✓');
+}
+
+// ─── TESTIMONIOS ───
+function buildTestimoniosEditor() {
+  const testimonials = document.querySelectorAll('.testimonial');
+  const container = document.getElementById('testimoniosEditor');
+  container.innerHTML = '';
+  testimonials.forEach((t, i) => {
+    const text = t.querySelector('.testimonial-text')?.textContent.replace(/^[""]|[""]$/g,'').trim() || '';
+    const name = t.querySelector('.author-name')?.textContent || '';
+    const role = t.querySelector('.author-role')?.textContent || '';
+    const div = document.createElement('div');
+    div.className = 'testimonial-edit-card';
+    div.innerHTML = `
+      <h4>Testimonio ${i+1}</h4>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Texto del testimonio</label>
+        <textarea class="edit-textarea" id="tm-text-${i}" style="width:100%">${text}</textarea>
+      </div>
+      <div class="t-edit-grid">
+        <div>
+          <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Nombre</label>
+          <input class="edit-input" id="tm-name-${i}" value="${name}" style="width:100%"/>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Cargo / empresa</label>
+          <input class="edit-input" id="tm-role-${i}" value="${role}" style="width:100%"/>
+        </div>
+      </div>
+      <button class="btn-apply" style="margin-top:10px;" onclick="applyTestimonio(${i})">Aplicar cambios</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function applyTestimonio(i) {
+  const testimonials = document.querySelectorAll('.testimonial');
+  const t = testimonials[i];
+  if (!t) return;
+  const textEl = t.querySelector('.testimonial-text');
+  if (textEl) textEl.textContent = '"' + document.getElementById(`tm-text-${i}`).value + '"';
+  const nameEl = t.querySelector('.author-name');
+  if (nameEl) nameEl.textContent = document.getElementById(`tm-name-${i}`).value;
+  const roleEl = t.querySelector('.author-role');
+  if (roleEl) roleEl.textContent = document.getElementById(`tm-role-${i}`).value;
+  const avatar = t.querySelector('.author-avatar');
+  if (avatar) {
+    const name = document.getElementById(`tm-name-${i}`).value;
+    avatar.textContent = name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  }
+  showToast('Testimonio actualizado ✓');
+}
+
+// ─── STATS ───
+function applyAllStats() {
+  const v1 = document.getElementById('s-stat1').value.replace(/,/g,'');
+  const v2 = document.getElementById('s-stat2').value.replace(/,/g,'');
+  const v3 = document.getElementById('s-stat3').value.replace(/,/g,'');
+  const v4 = document.getElementById('s-stat4').value;
+  if (!isNaN(v1)) animateCount(document.getElementById('stat1'), parseInt(v1), '', 1500);
+  if (!isNaN(v2)) animateCount(document.getElementById('stat2'), parseInt(v2), '', 1500);
+  if (!isNaN(v3)) animateCount(document.getElementById('stat3'), parseInt(v3), '', 1500);
+  document.getElementById('stat4').textContent = v4;
+  showToast('Estadísticas actualizadas ✓');
+}
+
+function applyStatLabel(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val.replace(/,/g,'');
+}
+
+function applyStatLabelText(idx, val) {
+  const labels = document.querySelectorAll('.stat-label');
+  if (labels[idx]) { labels[idx].textContent = val; showToast('Label actualizado ✓'); }
+}
+
+// ─── COLORES ───
+function applyCSSVar(name, val) {
+  document.documentElement.style.setProperty(name, val);
+}
+
+const originalColors = {
+  '--accent': '#e8d5a3', '--accent2': '#c4a46b', '--green': '#4ade80',
+  '--blue': '#60a5fa', '--bg': '#0a0a0a', '--text': '#f0ede8'
+};
+
+function resetColors() {
+  Object.entries(originalColors).forEach(([k,v]) => {
+    document.documentElement.style.setProperty(k, v);
+    const map = { '--accent':'c-accent', '--accent2':'c-accent2', '--green':'c-green', '--blue':'c-blue', '--bg':'c-bg', '--text':'c-text' };
+    if (map[k]) document.getElementById(map[k]).value = v;
+  });
+  showToast('Colores restaurados ✓');
+}
+
+// ─── GITHUB CONFIG ───
+const GH_OWNER = 'elparivera';
+const GH_REPO  = 'editorapk';
+const GH_FILE  = 'index.html';
+const GH_BRANCH = 'main';
+const TOKEN_KEY = 'tc_gh_token';
+
+// ─── PERSISTENCIA LOCAL (localStorage) ───
+const STORAGE_KEY = 'trackcloud_edits_v1';
+
+function collectAllEdits() {
+  const data = {};
+  const textIds = [
+    'hero-line1','hero-line2','hero-line3','hero-subtitle','hero-badge-text',
+    'hero-cta1','hero-cta2','feat-main-title','feat-main-desc','cta-main-title','cta-main-desc',
+    'stat1','stat2','stat3','stat4'
+  ];
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data['el_' + id] = el.textContent;
+  });
+  data['document_title'] = document.title;
+  const cssVars = ['--accent','--accent2','--green','--blue','--bg','--text','--bg2','--bg3','--surface','--border','--border2','--text2','--text3'];
+  const root = document.documentElement;
+  cssVars.forEach(v => {
+    const val = getComputedStyle(root).getPropertyValue(v).trim();
+    if (val) data['cssvar_' + v] = val;
+  });
+  document.querySelectorAll('.testimonial').forEach((t, i) => {
+    data['tm_text_' + i] = t.querySelector('.testimonial-text')?.textContent || '';
+    data['tm_name_' + i] = t.querySelector('.author-name')?.textContent || '';
+    data['tm_role_' + i] = t.querySelector('.author-role')?.textContent || '';
+  });
+  document.querySelectorAll('.feature-card').forEach((fc, i) => {
+    const iconEl = document.getElementById('fc-icon-' + i);
+    const titleEl = document.getElementById('fc-title-' + i);
+    const descEl = document.getElementById('fc-desc-' + i);
+    if (iconEl) data['fc_icon_' + i] = iconEl.textContent;
+    if (titleEl) data['fc_title_' + i] = titleEl.textContent;
+    if (descEl) data['fc_desc_' + i] = descEl.textContent;
+  });
+  document.querySelectorAll('.pricing-card').forEach((card, i) => {
+    data['plan_name_' + i] = card.querySelector('.plan-name')?.textContent || '';
+    data['plan_desc_' + i] = card.querySelector('.plan-desc')?.textContent || '';
+  });
+  const logoMain = document.getElementById('logo-name-main');
+  if (logoMain) data['logo_name'] = logoMain.textContent;
+  const logoImgWrap = document.getElementById('logo-img-wrap');
+  if (logoImgWrap) {
+    const img = logoImgWrap.querySelector('img');
+    if (img && img.src && img.src.startsWith('data:')) data['logo_img_src'] = img.src;
+  }
+  document.querySelectorAll('.nav-links a').forEach((a, i) => {
+    data['nav_text_' + i] = a.textContent.trim();
+    data['nav_href_' + i] = a.getAttribute('href') || '#';
+  });
+  document.querySelectorAll('.footer-col').forEach((col, ci) => {
+    col.querySelectorAll('a').forEach((a, li) => {
+      data['fl_text_' + ci + '_' + li] = a.textContent.trim();
+      data['fl_href_' + ci + '_' + li] = a.getAttribute('href') || '#';
+    });
+  });
+  return data;
+}
+
+function restoreAllEdits(data) {
+  if (!data) return;
+  Object.entries(data).forEach(([key, val]) => {
+    if (key.startsWith('el_')) {
+      const el = document.getElementById(key.slice(3));
+      if (el) el.textContent = val;
+    }
+  });
+  if (data['document_title']) document.title = data['document_title'];
+  const root = document.documentElement;
+  Object.entries(data).forEach(([key, val]) => {
+    if (key.startsWith('cssvar_')) root.style.setProperty(key.slice(7), val);
+  });
+  document.querySelectorAll('.testimonial').forEach((t, i) => {
+    if (data['tm_text_' + i]) { const el = t.querySelector('.testimonial-text'); if (el) el.textContent = data['tm_text_' + i]; }
+    if (data['tm_name_' + i]) { const el = t.querySelector('.author-name'); if (el) el.textContent = data['tm_name_' + i]; }
+    if (data['tm_role_' + i]) { const el = t.querySelector('.author-role'); if (el) el.textContent = data['tm_role_' + i]; }
+  });
+  document.querySelectorAll('.feature-card').forEach((fc, i) => {
+    const iconEl = document.getElementById('fc-icon-' + i);
+    const titleEl = document.getElementById('fc-title-' + i);
+    const descEl = document.getElementById('fc-desc-' + i);
+    if (iconEl && data['fc_icon_' + i]) iconEl.textContent = data['fc_icon_' + i];
+    if (titleEl && data['fc_title_' + i]) titleEl.textContent = data['fc_title_' + i];
+    if (descEl && data['fc_desc_' + i]) descEl.textContent = data['fc_desc_' + i];
+  });
+  document.querySelectorAll('.pricing-card').forEach((card, i) => {
+    if (data['plan_name_' + i]) { const el = card.querySelector('.plan-name'); if (el) el.textContent = data['plan_name_' + i]; }
+    if (data['plan_desc_' + i]) { const el = card.querySelector('.plan-desc'); if (el) el.textContent = data['plan_desc_' + i]; }
+  });
+  if (data['logo_name']) {
+    const logoMain = document.getElementById('logo-name-main');
+    if (logoMain) logoMain.textContent = data['logo_name'];
+    document.querySelectorAll('.footer-brand .nav-logo').forEach(el => {
+      const svg = el.querySelector('svg'); el.textContent = data['logo_name']; if (svg) el.prepend(svg);
+    });
+  }
+  if (data['logo_img_src']) {
+    const wrap = document.getElementById('logo-img-wrap');
+    if (wrap) wrap.innerHTML = `<img src="${data['logo_img_src']}" style="height:28px;width:auto;object-fit:contain;" alt="Logo"/>`;
+  }
+  document.querySelectorAll('.nav-links a').forEach((a, i) => {
+    if (data['nav_text_' + i]) a.textContent = data['nav_text_' + i];
+    if (data['nav_href_' + i]) a.setAttribute('href', data['nav_href_' + i]);
+  });
+  document.querySelectorAll('.footer-col').forEach((col, ci) => {
+    col.querySelectorAll('a').forEach((a, li) => {
+      if (data['fl_text_' + ci + '_' + li]) a.textContent = data['fl_text_' + ci + '_' + li];
+      if (data['fl_href_' + ci + '_' + li]) a.setAttribute('href', data['fl_href_' + ci + '_' + li]);
+    });
+  });
+}
+
+(function() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => restoreAllEdits(data));
+      } else {
+        setTimeout(() => restoreAllEdits(data), 100);
+      }
+    }
+  } catch(e) { console.warn('No se pudo restaurar edits:', e); }
+})();
+
+// ─── SAVE ALL (local) ───
+function saveAllChanges() {
+  try {
+    const data = collectAllEdits();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+// ─── TOKEN MODAL ───
+function openTokenModal() {
+  const modal = document.getElementById('tokenModal');
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('githubTokenInput').focus(), 100);
+}
+function closeTokenModal() {
+  document.getElementById('tokenModal').style.display = 'none';
+  document.getElementById('tokenError').style.display = 'none';
+}
+function saveGitHubToken() {
+  const token = document.getElementById('githubTokenInput').value.trim();
+  if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+    const err = document.getElementById('tokenError');
+    err.textContent = 'El token debe empezar con ghp_ o github_pat_';
+    err.style.display = 'block';
+    return;
+  }
+  localStorage.setItem(TOKEN_KEY, token);
+  closeTokenModal();
+  pushToGitHub();
+}
+
+// ─── GENERAR HTML LIMPIO PARA PUBLICAR ───
+function buildPublishHTML() {
+  const clone = document.documentElement.cloneNode(true);
+  // Quitar overlay admin y toast
+  ['adminOverlay','adminToast','tokenModal'].forEach(id => {
+    const el = clone.querySelector('#' + id);
+    if (el) el.remove();
+  });
+  // Quitar botón admin del nav
+  clone.querySelectorAll('[onclick*="openAdmin"]').forEach(el => el.remove());
+  // Inyectar colores editados como variables CSS
+  const root = document.documentElement;
+  const cssVars = ['--accent','--accent2','--green','--blue','--bg','--text','--bg2','--bg3','--surface','--border','--border2','--text2','--text3','--radius','--radius-sm'];
+  let inlineVars = ':root {';
+  cssVars.forEach(v => {
+    const val = getComputedStyle(root).getPropertyValue(v).trim();
+    if (val) inlineVars += `${v}:${val};`;
+  });
+  inlineVars += '}';
+  const styleTag = clone.querySelector('style');
+  if (styleTag) styleTag.textContent = inlineVars + '\n' + styleTag.textContent;
+  return '<!DOCTYPE html>\n' + clone.outerHTML;
+}
+
+// ─── PUBLICAR EN GITHUB ───
+async function pushToGitHub() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) { openTokenModal(); return; }
+
+  // UI: loading state
+  const btn = document.getElementById('btn-publish');
+  const btnText = document.getElementById('btn-publish-text');
+  const statusEl = document.getElementById('save-bar-status');
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  btnText.textContent = 'Publicando…';
+  statusEl.textContent = '⏳ Conectando con GitHub…';
+
+  try {
+    const apiBase = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json'
+    };
+
+    // 1. Obtener el SHA del archivo actual (necesario para actualizarlo)
+    statusEl.textContent = '⏳ Obteniendo versión actual…';
+    let sha = null;
+    try {
+      const getResp = await fetch(`${apiBase}?ref=${GH_BRANCH}`, { headers });
+      if (getResp.ok) {
+        const getData = await getResp.json();
+        sha = getData.sha;
+      } else if (getResp.status === 404) {
+        // Archivo no existe aún — lo crearemos
+        sha = null;
+      } else if (getResp.status === 401) {
+        throw new Error('Token inválido o expirado. Reconfigúralo.');
+      } else {
+        throw new Error(`Error al leer archivo: ${getResp.status}`);
+      }
+    } catch(fetchErr) {
+      if (fetchErr.message.includes('Token') || fetchErr.message.includes('Error')) throw fetchErr;
+      throw new Error('No se pudo conectar con GitHub. Verifica tu conexión.');
+    }
+
+    // 2. Construir el HTML publicable
+    statusEl.textContent = '⏳ Preparando HTML…';
+    const htmlContent = buildPublishHTML();
+    const encoded = btoa(unescape(encodeURIComponent(htmlContent)));
+
+    // 3. Hacer commit en GitHub
+    statusEl.textContent = '⏳ Publicando en GitHub…';
+    const body = {
+      message: `Admin update — ${new Date().toLocaleString('es-ES')}`,
+      content: encoded,
+      branch: GH_BRANCH
+    };
+    if (sha) body.sha = sha;
+
+    const putResp = await fetch(apiBase, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!putResp.ok) {
+      const errData = await putResp.json().catch(() => ({}));
+      if (putResp.status === 401) throw new Error('Token inválido. Reconfigúralo.');
+      if (putResp.status === 404) throw new Error(`Repo no encontrado: ${GH_OWNER}/${GH_REPO}`);
+      if (putResp.status === 422) throw new Error('Error de conflicto. Intenta de nuevo.');
+      throw new Error(errData.message || `Error ${putResp.status}`);
+    }
+
+    // 4. ¡Éxito!
+    saveAllChanges(); // también guardar en localStorage
+    const siteUrl = `https://${GH_OWNER}.github.io/${GH_REPO}/`;
+    statusEl.innerHTML = `✅ Publicado — <a href="${siteUrl}" target="_blank" style="color:#60a5fa;text-decoration:underline;">${siteUrl}</a>`;
+    showToast('¡Publicado en GitHub Pages! Estará en línea en ~1 min ✓');
+
+  } catch(err) {
+    statusEl.textContent = '❌ ' + err.message;
+    showToast('Error: ' + err.message, true);
+    // Si es error de token, ofrecer reconfigurar
+    if (err.message.includes('Token') || err.message.includes('token')) {
+      localStorage.removeItem(TOKEN_KEY);
+      setTimeout(() => openTokenModal(), 1500);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btnText.textContent = 'Guardar y publicar en línea';
+  }
+}
+
+// ─── EXPORTAR HTML (respaldo) ───
+function exportCleanHTML() {
+  const htmlContent = buildPublishHTML();
+  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'index.html';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('index.html descargado ✓');
+}
+
+// ─── TOAST ───
+let toastTimeout;
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('adminToast');
+  const msgEl = document.getElementById('toastMsg');
+  msgEl.textContent = msg;
+  toast.style.borderColor = isError ? 'rgba(248,113,113,0.3)' : 'rgba(74,222,128,0.3)';
+  toast.style.color = isError ? '#f87171' : '#4ade80';
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// Shake animation for wrong login
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }`;
+document.head.appendChild(shakeStyle);
+
+// Press Escape to close
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
+
+// ═══════════════════════════════════════
+// EXTENDED ADMIN LOGIC — Features, Footer, Logo
+// ═══════════════════════════════════════
+
+// ─── FEATURE CARDS EDITOR ───
+const FC_DEFAULTS = [
+  { icon:'🚀', title:'Deploy automático', desc:'Conecta GitHub, GitLab o Bitbucket. Cada push deploya automáticamente con zero configuración.' },
+  { icon:'🌐', title:'Networking instantáneo', desc:'SSL, dominios custom, balanceadores de carga y 100 Gbps de red interna desde el primer deploy.' },
+  { icon:'📈', title:'Escala automática', desc:'De 0 a millones de usuarios. Escala horizontal y vertical según la demanda en tiempo real.' },
+  { icon:'📊', title:'Observabilidad total', desc:'Logs, métricas y alertas en un solo lugar. Dashboards custom con métricas de cualquier servicio.' },
+  { icon:'🔄', title:'Rollbacks en 1 click', desc:'¿Algo salió mal? Vuelve a cualquier versión anterior en segundos, sin tiempo de inactividad.' },
+  { icon:'🤖', title:'Agentes IA', desc:'Detección automática de configuración. Railway lee tu código y configura los ajustes correctos.' },
+];
+
+function buildFeatCardsEditor() {
+  const container = document.getElementById('featCardsEditor');
+  if (!container || container.children.length > 0) return;
+  FC_DEFAULTS.forEach((fc, i) => {
+    const d = document.createElement('div');
+    d.className = 'testimonial-edit-card';
+    d.style.marginBottom = '12px';
+    d.innerHTML = `
+      <h4 style="font-size:12px;color:#5a5550;margin-bottom:12px;letter-spacing:.05em;text-transform:uppercase;">Card ${i+1}</h4>
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:10px;align-items:center;">
+        <div>
+          <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Emoji/Icon</label>
+          <input class="edit-input" id="fc-e-icon-${i}" value="${fc.icon}" style="width:100%;font-size:20px;text-align:center;"/>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Título</label>
+          <input class="edit-input" id="fc-e-title-${i}" value="${fc.title}" style="width:100%"/>
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:#5a5550;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Descripción</label>
+        <textarea class="edit-textarea" id="fc-e-desc-${i}" style="width:100%;min-height:60px;">${fc.desc}</textarea>
+      </div>
+      <button class="btn-apply" onclick="applyFeatureCard(${i})">Aplicar card ${i+1}</button>
+    `;
+    container.appendChild(d);
+  });
+}
+
+function applyFeatureCard(i) {
+  const icon = document.getElementById(`fc-e-icon-${i}`).value;
+  const title = document.getElementById(`fc-e-title-${i}`).value;
+  const desc = document.getElementById(`fc-e-desc-${i}`).value;
+  const iconEl = document.getElementById(`fc-icon-${i}`);
+  const titleEl = document.getElementById(`fc-title-${i}`);
+  const descEl = document.getElementById(`fc-desc-${i}`);
+  if (iconEl) iconEl.textContent = icon;
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  showToast(`Feature card ${i+1} actualizada ✓`);
+}
+
+// ─── FOOTER EDITOR ───
+function applyFooter(targetId, inputId) {
+  const val = document.getElementById(inputId).value;
+  const el = document.getElementById(targetId);
+  if (el) { el.textContent = val; showToast('Footer actualizado ✓'); }
+}
+
+function buildFooterLinksEditor() {
+  const container = document.getElementById('footerLinksEditor');
+  if (!container || container.children.length > 0) return;
+  const cols = document.querySelectorAll('.footer-col');
+  cols.forEach((col, ci) => {
+    const links = col.querySelectorAll('a');
+    const wrap = document.createElement('div');
+    wrap.style.marginBottom = '16px';
+    const h = document.getElementById(`fcolh-${ci}`);
+    const colName = h ? h.textContent : `Columna ${ci+1}`;
+    wrap.innerHTML = `<div style="font-size:11px;font-weight:700;color:#c4a46b;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">${colName}</div>`;
+    links.forEach((link, li) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:center;';
+      const labelIn = `<input class="edit-input" placeholder="Texto" id="fl-text-${ci}-${li}" value="${link.textContent.trim()}" style="width:100%"/>`;
+      const hrefIn = `<input class="edit-input" placeholder="URL" id="fl-href-${ci}-${li}" value="${link.getAttribute('href') || '#'}" style="width:100%"/>`;
+      const btn = `<button class="btn-apply" onclick="applyFooterLink(${ci},${li})">✓</button>`;
+      row.innerHTML = labelIn + hrefIn + btn;
+      wrap.appendChild(row);
+    });
+    container.appendChild(wrap);
+  });
+}
+
+function applyFooterLink(ci, li) {
+  const cols = document.querySelectorAll('.footer-col');
+  const col = cols[ci];
+  if (!col) return;
+  const links = col.querySelectorAll('a');
+  const link = links[li];
+  if (!link) return;
+  const text = document.getElementById(`fl-text-${ci}-${li}`).value;
+  const href = document.getElementById(`fl-href-${ci}-${li}`).value;
+  link.textContent = text;
+  link.setAttribute('href', href);
+  showToast('Link actualizado ✓');
+}
+
+function buildNavLinksEditor() {
+  const container = document.getElementById('navLinksEditor');
+  if (!container || container.children.length > 0) return;
+  const navLinks = document.querySelectorAll('.nav-links a');
+  navLinks.forEach((link, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:center;';
+    row.innerHTML = `
+      <input class="edit-input" placeholder="Texto" id="nl-text-${i}" value="${link.textContent.trim()}" style="width:100%"/>
+      <input class="edit-input" placeholder="URL" id="nl-href-${i}" value="${link.getAttribute('href') || '#'}" style="width:100%"/>
+      <button class="btn-apply" onclick="applyNavLink(${i})">✓</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function applyNavLink(i) {
+  const links = document.querySelectorAll('.nav-links a');
+  const link = links[i];
+  if (!link) return;
+  link.textContent = document.getElementById(`nl-text-${i}`).value;
+  link.setAttribute('href', document.getElementById(`nl-href-${i}`).value);
+  showToast('Nav link actualizado ✓');
+}
+
+// ─── LOGO ───
+let originalLogoSVG = null;
+
+function initLogoPreview() {
+  const preview = document.getElementById('logo-preview');
+  if (!preview) return;
+  const wrap = document.getElementById('logo-img-wrap');
+  const name = document.getElementById('logo-name-main');
+  if (wrap && name) {
+    preview.innerHTML = wrap.innerHTML + ' ' + name.textContent;
+    originalLogoSVG = wrap.innerHTML;
+  }
+}
+
+function applyLogoName() {
+  const val = document.getElementById('logo-name-input').value;
+  document.querySelectorAll('#logo-name-main, .nav-logo').forEach(el => {
+    // Only update text nodes
+    if (el.id === 'logo-name-main') el.textContent = val;
+  });
+  const nameMain = document.getElementById('logo-name-main');
+  if (nameMain) nameMain.textContent = val;
+  // Update footer logo too
+  document.querySelectorAll('.footer-brand .nav-logo').forEach(el => {
+    const svg = el.querySelector('svg');
+    el.textContent = val;
+    if (svg) el.prepend(svg);
+  });
+  document.title = val + ' — The all-in-one intelligent cloud provider';
+  initLogoPreview();
+  showToast('Nombre del logo actualizado ✓');
+}
+
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    applyLogoImage(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleLogoDrop(e) {
+  e.preventDefault();
+  document.getElementById('logoDropZone').style.borderColor = '#2e2e2e';
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => applyLogoImage(ev.target.result);
+  reader.readAsDataURL(file);
+}
+
+function applyLogoImage(src) {
+  const imgTag = `<img src="${src}" style="height:28px;width:auto;object-fit:contain;" alt="Logo"/>`;
+  const wrap = document.getElementById('logo-img-wrap');
+  if (wrap) wrap.innerHTML = imgTag;
+  // Update footer logo too
+  document.querySelectorAll('.footer-brand .nav-logo svg').forEach(svg => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'height:32px;width:auto;object-fit:contain;';
+    svg.replaceWith(img);
+  });
+  initLogoPreview();
+  showToast('Logo actualizado ✓');
+}
+
+function resetLogo() {
+  if (originalLogoSVG) {
+    const wrap = document.getElementById('logo-img-wrap');
+    if (wrap) wrap.innerHTML = originalLogoSVG;
+  }
+  initLogoPreview();
+  showToast('Logo restaurado ✓');
+}
+
+function handleFaviconUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+    link.href = e.target.result;
+    showToast('Favicon actualizado ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleHeroBgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const heroBg = document.querySelector('.hero-bg');
+    if (heroBg) {
+      heroBg.style.backgroundImage = `url(${e.target.result})`;
+      heroBg.style.backgroundSize = 'cover';
+      heroBg.style.backgroundPosition = 'center';
+      heroBg.style.opacity = '0.3';
+    }
+    showToast('Imagen de fondo aplicada ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetHeroBg() {
+  const heroBg = document.querySelector('.hero-bg');
+  if (heroBg) {
+    heroBg.style.backgroundImage = '';
+    heroBg.style.opacity = '';
+  }
+  showToast('Fondo del hero restaurado ✓');
+}
+
+// ─── HOOK INTO LOGIN ───
+const _origBuildLogin = typeof buildTestimoniosEditor === 'function' ? buildTestimoniosEditor : null;
+const _origOpenAdmin = openAdmin;
+openAdmin = function() {
+  _origOpenAdmin();
+  if (adminLoggedIn) {
+    setTimeout(() => {
+      buildFeatCardsEditor();
+      buildFooterLinksEditor();
+      buildNavLinksEditor();
+      initLogoPreview();
+    }, 50);
+  }
+};
+
+// Also hook after login
+const _origDoLogin = doLogin;
+doLogin = function() {
+  _origDoLogin();
+  if (adminLoggedIn) {
+    setTimeout(() => {
+      buildFeatCardsEditor();
+      buildFooterLinksEditor();
+      buildNavLinksEditor();
+      initLogoPreview();
+    }, 100);
+  }
+};
+
+</script>
+
+</body>
+</html>
